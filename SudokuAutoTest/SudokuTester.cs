@@ -230,6 +230,7 @@ namespace SudokuAutoTest
                             Logger.Error($"SudokuPanel Not Invalid:\n {sudokuPanel}", _logFile);
                             return (int) ErrorType.SudokuPanelInvalid;
                         }
+
                         sudokuSets.Add(hashCode);
                     }
                     catch (Exception e)
@@ -246,7 +247,74 @@ namespace SudokuAutoTest
             Logger.Error($"Sudoku.txt doesn't have engough sudoku panels! Expect:{count} Actual:{sudokuSets.Count}", _logFile);
             return (int)ErrorType.NotEnoughCount;
         }
+        //have a try
+        /*
+        public int CheckValid(string puzzlePath, string filePath, int count)
+        {
+            //新申请一个数独棋盘
+            var sudokuSets = new HashSet<string>();
+            //从filepath路径中读取相应内容
+            var content = File.ReadAllText(filePath);
+            string splitSymbol = Environment.NewLine + Environment.NewLine;
+            var multipleLines = content.Split(new[] { splitSymbol }, StringSplitOptions.RemoveEmptyEntries);
+            if (multipleLines.Length == 1)
+            {
+                multipleLines = content.Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            //若puzzle路径不为空，则读取其中的puzzle并进行split，此时filepath内是解得的答案
+            if (string.IsNullOrEmpty(puzzlePath))
+            {
+                var puzzleContent = File.ReadAllText(puzzlePath);
+                var puzzleLines = puzzleContent.Split(new[] { splitSymbol }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            
+            if (multipleLines.Any())
+            {
+                foreach (var lines in multipleLines)
+                {
+                    try
+                    {
+                        var sudokuPanel =
+                            new SudokuPanel(
+                                lines.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries),
+                                NumberId);
+                        string hashCode = GetHashCode(sudokuPanel);
+                        //进行判重
+                        if (sudokuSets.Contains(hashCode))
+                        {
+                            Logger.Error("Sudoku.txt have repeated sudoku panels!", _logFile);
+                            return (int)ErrorType.RepeatedPanels;
+                        }
+                        //进行数独的有效性检查
+                        if (!sudokuPanel.Valid)
+                        {
+                            Logger.Error($"SudokuPanel Not Invalid:\n {sudokuPanel}", _logFile);
+                            return (int)ErrorType.SudokuPanelInvalid;
+                        }
+                        //检查解与题目是否对应】
+                        if (SudokuPanel.Equals)
+                        {
+
+                        }
+                        sudokuSets.Add(hashCode);
+                    }
+                    catch (Exception e)
+                    {
+                        //the sudoku is not valid.
+                        break;
+                    }
+                }
+                if (sudokuSets.Count == count)
+                {
+                    return 1;
+                }
+            }
+            Logger.Error($"Sudoku.txt doesn't have engough sudoku panels! Expect:{count} Actual:{sudokuSets.Count}", _logFile);
+            return (int)ErrorType.NotEnoughCount;
+        }
+        */
     }
+}
 
     public class SudokuPanel
     {
@@ -318,6 +386,24 @@ namespace SudokuAutoTest
                             return false;
                         }
                         rowCheck[i, num] = colCheck[j, num] = squareCheck[k, num] = true;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private bool MatchPuzzle(SudokuPanel sudokuPuzzle)
+        {
+            
+            for (int i = 0; i < this.Grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < this.Grid.GetLength(1); j++)
+                {
+                    int Puzzlenum = int.Parse(sudokuPuzzle.Grid[i, j]); 
+                    int Answernum = int.Parse(this.Grid[i, j]);
+                    if(Puzzlenum!=0&&Puzzlenum!=Answernum)
+                    {
+                        return false;
                     }
                 }
             }
