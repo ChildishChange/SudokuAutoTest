@@ -247,8 +247,8 @@ namespace SudokuAutoTest
             Logger.Error($"Sudoku.txt doesn't have engough sudoku panels! Expect:{count} Actual:{sudokuSets.Count}", _logFile);
             return (int)ErrorType.NotEnoughCount;
         }
-        //have a try
-        /*
+        //Overview:将-s和-c功能整合到一起
+        //当puzzlePath为非空串时，测试-s，此时count应为0，否则测试-c
         public int CheckValid(string puzzlePath, string filePath, int count)
         {
             //新申请一个数独棋盘
@@ -262,12 +262,25 @@ namespace SudokuAutoTest
                 multipleLines = content.Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
             }
             //若puzzle路径不为空，则读取其中的puzzle并进行split，此时filepath内是解得的答案
-            if (string.IsNullOrEmpty(puzzlePath))
-            {
-                var puzzleContent = File.ReadAllText(puzzlePath);
-                var puzzleLines = puzzleContent.Split(new[] { splitSymbol }, StringSplitOptions.RemoveEmptyEntries);
-            }
+            bool hasPuzzle = string.IsNullOrEmpty(puzzlePath);
+            string puzzleContent;
+            LinkedList<string> puzzleLines = new LinkedList<string>();
             
+            if (hasPuzzle)
+            {
+                puzzleContent = File.ReadAllText(puzzlePath);
+                string[] puzzleTemp = puzzleContent.Split(new[] { splitSymbol }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string puzzle in puzzleTemp)
+                {
+                    puzzleLines.AddLast(puzzle);  
+                }
+                if(puzzleLines.Count!=multipleLines.Length)
+                {
+                    Logger.Error($"Puzzle Number Do Not Match Answer Number!", _logFile);
+                    return (int)ErrorType.NumbersDoNotMatch;
+                }
+            }
+            //开始测试
             if (multipleLines.Any())
             {
                 foreach (var lines in multipleLines)
@@ -292,9 +305,19 @@ namespace SudokuAutoTest
                             return (int)ErrorType.SudokuPanelInvalid;
                         }
                         //检查解与题目是否对应】
-                        if (SudokuPanel.Equals)
+                        if (hasPuzzle)
                         {
-
+                            //从puzzleline中取出题目
+                            var puzzlePanel =
+                                new SudokuPanel(
+                                    puzzleLines.First.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries),
+                                    NumberId);
+                            puzzleLines.RemoveFirst();
+                            if (sudokuPanel.MatchPuzzle(puzzlePanel))
+                            {
+                                Logger.Error($"Sudoku Answer Do Not Match The Puzzle!:\n Puzzle:\n{puzzlePanel}\n\nAnswer:\n{sudokuPanel}", _logFile);
+                                return (int)ErrorType.SudokuAnswerDoNotMatch;
+                            }
                         }
                         sudokuSets.Add(hashCode);
                     }
@@ -304,17 +327,23 @@ namespace SudokuAutoTest
                         break;
                     }
                 }
-                if (sudokuSets.Count == count)
+                if (hasPuzzle)
                 {
                     return 1;
+                }
+                else
+                {
+                    if(sudokuSets.Count == count)
+                    {
+                        return 1;
+                    }
                 }
             }
             Logger.Error($"Sudoku.txt doesn't have engough sudoku panels! Expect:{count} Actual:{sudokuSets.Count}", _logFile);
             return (int)ErrorType.NotEnoughCount;
         }
-        */
+        
     }
-}
 
     public class SudokuPanel
     {
@@ -392,7 +421,7 @@ namespace SudokuAutoTest
             return true;
         }
 
-        private bool MatchPuzzle(SudokuPanel sudokuPuzzle)
+        public bool MatchPuzzle(SudokuPanel sudokuPuzzle)
         {
             
             for (int i = 0; i < this.Grid.GetLength(0); i++)
@@ -422,6 +451,8 @@ namespace SudokuAutoTest
         RepeatedPanels = -6,
         SudokuPanelInvalid = -7,
         NotEnoughCount = -8,
-        CanNotDoEfficientTest = -9
+        CanNotDoEfficientTest = -9,
+        NumbersDoNotMatch = -10,
+        SudokuAnswerDoNotMatch = -11
     }
 }
