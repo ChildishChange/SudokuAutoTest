@@ -310,7 +310,7 @@ namespace SudokuAutoTest
                             //从puzzleline中取出题目
                             var puzzlePanel =
                                 new SudokuPanel(
-                                    puzzleLines.First.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries),
+                                    puzzleLines.First.Value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries),
                                     NumberId);
                             puzzleLines.RemoveFirst();
                             if (sudokuPanel.MatchPuzzle(puzzlePanel))
