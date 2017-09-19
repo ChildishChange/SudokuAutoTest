@@ -262,7 +262,7 @@ namespace SudokuAutoTest
                 multipleLines = content.Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
             }
             //若puzzle路径不为空，则读取其中的puzzle并进行split，此时filepath内是解得的答案
-            bool hasPuzzle = string.IsNullOrEmpty(puzzlePath);
+            bool hasPuzzle = string.IsNullOrEmpty(puzzlePath)^true;
             string puzzleContent;
             LinkedList<string> puzzleLines = new LinkedList<string>();
             
