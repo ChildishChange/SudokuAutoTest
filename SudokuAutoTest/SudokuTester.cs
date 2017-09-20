@@ -313,7 +313,7 @@ namespace SudokuAutoTest
                                     puzzleLines.First.Value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries),
                                     NumberId);
                             puzzleLines.RemoveFirst();
-                            if (sudokuPanel.MatchPuzzle(puzzlePanel))
+                            if (!sudokuPanel.MatchPuzzle(puzzlePanel))
                             {
                                 Logger.Error($"Sudoku Answer Do Not Match The Puzzle!:\n Puzzle:\n{puzzlePanel}\n\nAnswer:\n{sudokuPanel}", _logFile);
                                 return (int)ErrorType.SudokuAnswerDoNotMatch;

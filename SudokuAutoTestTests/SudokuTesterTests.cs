@@ -14,16 +14,11 @@ namespace SudokuAutoTest.Tests
         [Test()]
         public void CheckValidTest_s()
         {
-            SudokuTester tester = new SudokuTester("D:\\", "14061195");
-            int result = tester.CheckValid("D:\\puzzle1.txt","D:\\result.txt",0);
+            SudokuTester tester = new SudokuTester("D:\\", "14061198");
+            int result = tester.CheckValid("D:\\puzzle1.txt","D:\\sudoku.txt",0);
+            
             Assert.True(result == 1);
         }
-        [Test()]
-        public void CheckValidTest_c()
-        {
-            SudokuTester tester = new SudokuTester("D:\\", "14061195");
-            int result = tester.CheckValid("", "D:\\result.txt", 1);
-            Assert.True(result == 1);
-        }
+
     }
 }
