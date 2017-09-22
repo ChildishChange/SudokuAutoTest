@@ -88,7 +88,23 @@ namespace SudokuAutoTest
                     return (int) ErrorType.OutOfTimeCloseExe;
                 }
                 //获取错误代码
-                var errorNum = CheckValid(checkFile, int.Parse(Regex.Match(arguments, @"\d+").Value));
+                //这里需要进行一些修改，根据-c-s来调用checkvalid
+                var parameters = arguments.Split(' ');
+                int errorNum = 0;
+                //若为 - c即执行正常的CheckValid(puzzlePath = null, filePath, count)
+                if(parameters.First().Equals("-c"))
+                {
+                    //errorNum = CheckValid(checkFile, int.Parse(Regex.Match(arguments, @"\d+").Value));
+                    errorNum = CheckValid("", checkFile, int.Parse(Regex.Match(arguments, @"\d+").Value));
+                }
+                //若为 - s即执行CheckValid(puzzlePath, filePath, count),此时的count为0
+                else
+                {
+                    
+                    
+                    errorNum = CheckValid(parameters.Last(),checkFile,0);
+                }
+               
                 if (errorNum > 0)
                 {
                     Logger.Info($"Arguments:{arguments} Normal, spend time {(double)timeWatch.ElapsedMilliseconds/1000}s", _logFile);
@@ -312,12 +328,12 @@ namespace SudokuAutoTest
                                 new SudokuPanel(
                                     puzzleLines.First.Value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries),
                                     NumberId);
-                            puzzleLines.RemoveFirst();
                             if (!sudokuPanel.MatchPuzzle(puzzlePanel))
                             {
                                 Logger.Error($"Sudoku Answer Do Not Match The Puzzle!:\n Puzzle:\n{puzzlePanel}\n\nAnswer:\n{sudokuPanel}", _logFile);
                                 return (int)ErrorType.SudokuAnswerDoNotMatch;
                             }
+                            puzzleLines.RemoveFirst();
                         }
                         sudokuSets.Add(hashCode);
                     }
@@ -327,7 +343,7 @@ namespace SudokuAutoTest
                         break;
                     }
                 }
-                if (hasPuzzle)
+                if (hasPuzzle&&puzzleLines.Count == 0)
                 {
                     return 1;
                 }
