@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace SudokuAutoTest
 {
     public class SudokuTester
@@ -169,7 +170,8 @@ namespace SudokuAutoTest
             //正确性测试占分25,共5个测试点
             //其中10分为错误情况得分,在自动化测试中不进行
             //剩余15分共有5个正确性测试点
-            string[] argumentScoreMap = new string[]
+            //先测-c
+            string[] argumentScoreMap_c = new string[]
             {
                 "-c 1",
                 "-c 5",
@@ -177,7 +179,7 @@ namespace SudokuAutoTest
                 "-c 500",
                 "-c 1000"
             };
-            foreach (var argument in argumentScoreMap)
+            foreach (var argument in argumentScoreMap_c)
             {
                 Scores.Add(new Tuple<string, double>(argument, ExecuteTest(argument, 60)));
             }
@@ -203,6 +205,46 @@ namespace SudokuAutoTest
                     "-c 1000000"})
                 {
                     Scores.Add(new Tuple<string, double>(argument, (int) ErrorType.CanNotDoEfficientTest));
+                }
+            }
+            //再测-s
+            string[] argumentScoreMap_s = new string[]
+            {
+                "1puzzle.txt",
+                "5puzzle.txt",
+                "100puzzle.txt",
+                "500puzzle.txt",
+                "1000puzzle.txt",
+
+            };
+            foreach (var argument in argumentScoreMap_s)
+            {
+                Scores.Add(new Tuple<string, double>("-s "+argument, ExecuteTest("-s "+Path.GetFullPath(argument), 60)));
+            }
+            if (Scores.Where(i => i.Item2 > 0).ToList().Count >= 4)
+            {
+                //剩下10分,分为2组测试
+                //5万+
+                //100万+
+                string _50000puzzle = "50000puzzle.txt";
+                string _millionpuzzle = "1000000puzzle.txt";
+                Scores.Add(new Tuple<string, double>("-s "+_50000puzzle, ExecuteTest("-s " + Path.GetFullPath(_50000puzzle), Program.MaxLimitTime)));
+                if (Scores.Last().Item2 > 0)
+                {
+                    Scores.Add(new Tuple<string, double>("-s " + _millionpuzzle, ExecuteTest("-s " + Path.GetFullPath(_millionpuzzle), Program.MaxLimitTime)));
+                }
+                else
+                {
+                    Scores.Add(new Tuple<string, double>("-s " + _millionpuzzle, (int)ErrorType.OutOfTimeCloseExe));
+                }
+            }
+            else
+            {
+                foreach (var argument in new[]{
+                    "-s 50000puzzle.txt",
+                    "-c 1000000puzzle.txt"})
+                {
+                    Scores.Add(new Tuple<string, double>(argument, (int)ErrorType.CanNotDoEfficientTest));
                 }
             }
         }
