@@ -323,7 +323,6 @@ namespace SudokuAutoTest
             bool hasPuzzle = string.IsNullOrEmpty(puzzlePath)^true;
             string puzzleContent;
             LinkedList<string> puzzleLines = new LinkedList<string>();
-            
             if (hasPuzzle)
             {
                 puzzleContent = File.ReadAllText(puzzlePath);
@@ -349,18 +348,25 @@ namespace SudokuAutoTest
                             new SudokuPanel(
                                 lines.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries),
                                 NumberId);
-                        string hashCode = GetHashCode(sudokuPanel);
-                        //进行判重
-                        if (sudokuSets.Contains(hashCode))
-                        {
-                            Logger.Error("Sudoku.txt have repeated sudoku panels!", _logFile);
-                            return (int)ErrorType.RepeatedPanels;
-                        }
+                        
+                        
                         //进行数独的有效性检查
                         if (!sudokuPanel.Valid)
                         {
                             Logger.Error($"SudokuPanel Not Invalid:\n {sudokuPanel}", _logFile);
                             return (int)ErrorType.SudokuPanelInvalid;
+                        }
+                        //进行判重
+                        if (!hasPuzzle)
+                        { 
+                            string hashCode = GetHashCode(sudokuPanel);
+                            if (sudokuSets.Contains(hashCode))
+                            {
+                                Logger.Error("Sudoku.txt have repeated sudoku panels!", _logFile);
+                                return (int)ErrorType.RepeatedPanels;
+                            }
+                            sudokuSets.Add(hashCode);
+
                         }
                         //检查解与题目是否对应】
                         if (hasPuzzle)
@@ -377,7 +383,7 @@ namespace SudokuAutoTest
                             }
                             puzzleLines.RemoveFirst();
                         }
-                        sudokuSets.Add(hashCode);
+                        
                     }
                     catch (Exception e)
                     {
